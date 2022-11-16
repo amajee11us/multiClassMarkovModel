@@ -68,7 +68,6 @@ class MarkovModel:
         self.N = 0
         self.M = 0
         self.Domain_Mapping = []
-        self.Variable_Name_Mapping = []
         self.Functions = []
         self.Markov_Models = []
         self.import_markov_model(filename)
@@ -87,73 +86,52 @@ class MarkovModel:
         self.N = int(f.readline())
         # Third line is cardinalities (# values each variable can have)
         third_line = [eval(x) for x in f.readline().split()]
-        self.add_variables(third_line)
+        # Iterate through the variable domains
+        for i in range(len(third_line)):
+            self.Domain_Mapping.append(third_line[i])
         # Fourth line is the number of functions
-        self.M = int(f.readline())
+        fourth_line = f.readline()
+        # Handle the example vs actual Sample case
+        while ( fourth_line == '\n' ):
+            fourth_line = f.readline()
+        self.M = int(fourth_line)
         # Next M-lines are the functions
         for func_idx in range(self.M):
             next_function = [eval(x) for x in f.readline().split()]
             self.Functions.append(FunctionModel(next_function))
         
+        #Line between sections is blank
+        f.readline()
+
         # Function Specification follows
         for func_idx in range(self.M):
             # First line is blank
-            f.readline()
+            # Handle the example vs actual Sample case in if block
+            first_line = f.readline()
             # Second line is # of values in truth table
-            items_in_function = int(f.readline())
-            # Third line (and on depending on total) is all values
-            list_of_values = [float(x) for x in f.readline().split()]
+            second_line = first_line.split()
+            if ( first_line == '\n' ):
+                second_line = f.readline().split()
+            
+            # Handle the example vs actual Sample case in if block
+            list_of_values = []
+            items_in_function = int(second_line[0])
+            if ( len(second_line) != 1):
+                
+                # Third line (and on depending on total) is all values
+                list_of_values = [float(x) for x in second_line[1:]]
+            else:
+                # Third line (and on depending on total) is all values
+                list_of_values = [float(x) for x in f.readline().split()]
+            
             while ( items_in_function != len(list_of_values)):
                 next_list_of_values = [float(x) for x in f.readline().split()]
                 list_of_values.extend(next_list_of_values)
             self.Functions[func_idx].add_table(self.Domain_Mapping, list_of_values)
             markov_model = self.Functions[func_idx].create_dataframe()
-            print(markov_model)
-            print('\n')
             self.Markov_Models.append(markov_model)
 
-
-    """
-    Expects a list of variable cardinality values. (List of integers)
-    Ex: Third line of UAI file. Others can be added later
-    """
-    def add_variables(self, cardinality_list):
-        # Iterate through the variable domains
-        for i in range(len(cardinality_list)):
-            self.Domain_Mapping.append(cardinality_list[i])
-            # Index will be the end of the list - 1
-            var_index = len(self.Domain_Mapping) - 1
-            # Make var name based on index as follows:
-            # 0 = A, 1 = B, ..., 25 = Z, 26 = AA, ...
-            # Only goes up to ZZ which is 700 indixes so should be enough...
-            var_name = ''
-            a_plus_index = ord('A') + var_index
-            # If block for handling indexes greater than A-Z (0-25)
-            if ( a_plus_index > ord('Z') ):
-                tmp_index = var_index
-                delta = ord('Z') - ord('A') + 1
-                second_char = (int) (tmp_index / delta) - 1
-                var_name += chr(ord('A') + second_char)
-                tmp_index = tmp_index - ((second_char+1) * delta)
-                a_plus_index = ord('A') + tmp_index
-            var_name += chr(a_plus_index)
-            self.Variable_Name_Mapping.append(var_name)
-
-    """
-    Helper function to map a string variable name to a variable index
-    """
-    def name_to_index(self, var_name):
-        return self.Variable_Name_Mapping.index(var_name)
-
-    """
-    Helper function to map an index of a variable to a variable name
-    """
-    def index_to_name(self, var_index):
-        return self.Variable_Name_Mapping[var_index]
             
-
-
-
 
         
 
@@ -163,8 +141,15 @@ if __name__ == '__main__':
     filename = '../examples/1.uai'
     print('\nMarkov model from ' + filename + '\n')
     x = MarkovModel(filename)
+    print('LENGTH: ' + str(len(x.Markov_Models)) + '\n')
     filename = '../examples/2.uai'
     print('\nMarkov model from ' + filename + '\n')
     y = MarkovModel(filename)
+    print('LENGTH: ' + str(len(y.Markov_Models)) + '\n')
+    for i in range(1,5):
+        filename = '../examples/MLC/Sample_' + str(i) + '_MLC_2022.uai'
+        print('\nMarkov model from ' + filename + '\n')
+        z = MarkovModel(filename)
+        print('LENGTH: ' + str(len(z.Markov_Models)) + '\n')
 
 
