@@ -1,6 +1,7 @@
 import os, itertools
 import pandas as pd
 import numpy as np
+from loadData import LoadTestFormat
 
 
 
@@ -56,7 +57,6 @@ class FunctionModel:
 
 
 class MarkovModel:
-
     """
     Create Markov model object that will
     take a .UAI file and import the data to
@@ -138,18 +138,24 @@ class MarkovModel:
 
 if __name__ == '__main__':
     os.chdir(os.path.dirname(__file__))
-    filename = '../examples/1.uai'
-    print('\nMarkov model from ' + filename + '\n')
-    x = MarkovModel(filename)
+    filename = '../examples/1'
+    filename_uai = filename + '.uai'
+    filename_data = filename + '.data'
+    print('\nMarkov model from ' + filename_uai + '\n')
+    x = MarkovModel(filename_uai)
     print('LENGTH: ' + str(len(x.Markov_Models)) + '\n')
-    filename = '../examples/2.uai'
-    print('\nMarkov model from ' + filename + '\n')
-    y = MarkovModel(filename)
-    print('LENGTH: ' + str(len(y.Markov_Models)) + '\n')
+    tmp = LoadTestFormat(filename_data)
+    #filename = '../examples/2.uai'
+    #print('\nMarkov model from ' + filename + '\n')
+    #y = MarkovModel(filename)
+    #print('LENGTH: ' + str(len(y.Markov_Models)) + '\n')
     for i in range(1,5):
-        filename = '../examples/MLC/Sample_' + str(i) + '_MLC_2022.uai'
-        print('\nMarkov model from ' + filename + '\n')
-        z = MarkovModel(filename)
+        filename = '../examples/MLC/Sample_' + str(i) + '_MLC_2022'
+        filename_uai = filename + '.uai'
+        filename_data = filename + '.data'
+        print('\nMarkov model from ' + filename_uai + '\n')
+        z = MarkovModel(filename_uai)
         print('LENGTH: ' + str(len(z.Markov_Models)) + '\n')
+        tmp = LoadTestFormat(filename_data)
 
 
