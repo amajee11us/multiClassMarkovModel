@@ -145,6 +145,7 @@ if __name__ == '__main__':
     x = MarkovModel(filename_uai)
     print('LENGTH: ' + str(len(x.Markov_Models)) + '\n')
     tmp = LoadTestFormat(filename_data)
+    tmp_evid, tmp_query, tmp_weight = tmp.get_dataframes()
     #filename = '../examples/2.uai'
     #print('\nMarkov model from ' + filename + '\n')
     #y = MarkovModel(filename)
@@ -157,5 +158,6 @@ if __name__ == '__main__':
         z = MarkovModel(filename_uai)
         print('LENGTH: ' + str(len(z.Markov_Models)) + '\n')
         tmp = LoadTestFormat(filename_data)
+        tmp_evid, tmp_query, tmp_weight = tmp.get_dataframes()
 
 

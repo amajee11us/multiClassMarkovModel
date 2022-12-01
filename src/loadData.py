@@ -66,7 +66,7 @@ class LoadTestFormat:
             weight_rows.append(row[-1])
             count = 0
             for x,y in zip(*[iter(row)]*2):
-                entry_in_row = (x,y)
+                entry_in_row = y #(x,y)
                 if ( count < numOfEvidenceVariables):
                     evidence_row.append(entry_in_row)
                 else:
@@ -79,3 +79,10 @@ class LoadTestFormat:
             #print(query_rows)
 
         #print(df)
+        self.evidence_df = pd.DataFrame(data=evidence_rows, columns=indexObservedVariables)
+        self.query_df = pd.DataFrame(data=query_rows, columns=indexQueryVariables)
+        self.weights_df = pd.DataFrame(data=weight_rows, columns=['weights'])
+
+    def get_dataframes(self):
+        return self.evidence_df, self.query_df, self.weights_df
+
