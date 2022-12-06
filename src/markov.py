@@ -1,9 +1,9 @@
 import os, itertools
 import pandas as pd
 import numpy as np
-from loadData import LoadTestFormat
-
-
+from loadData import LoadData
+from pgmpy.models import MarkovNetwork as MN
+from pgmpy.factors.discrete import DiscreteFactor as DF
 
 
 class FunctionModel:
@@ -17,6 +17,8 @@ class FunctionModel:
         self.VariablesInFunction = function_line[0]
         self.VariableIndexes = function_line[1:]
         self.Truth_Table = []
+        self.VariableRangeList = []
+        self.VariableValues = []
 
     def add_table(self, Domain_Mapping, list_of_values):
         var_range_list = []
@@ -27,18 +29,20 @@ class FunctionModel:
             # Create all values of the variable var_index 
             # If cardinality = 3, then var_range = [0,1,2]
             var_range_list.append(var_range)
-        
+            self.VariableRangeList.append(Domain_Mapping[var_index])
         # Create truth table by combining all combinations
         i = 0
         # Handle normal case
         if ( len(var_range_list) != 1):
             for truth_entry in itertools.product(*var_range_list):
                 self.Truth_Table.append((truth_entry, list_of_values[i]))
+                self.VariableValues.append(list_of_values[i])
                 i += 1
         # Single param case so dont use product
         else:
             for truth_entry in var_range_list[0]:
                 self.Truth_Table.append(([truth_entry], list_of_values[i]))
+                self.VariableValues.append(list_of_values[i])
                 i += 1
     
     def create_dataframe(self):
@@ -70,6 +74,7 @@ class MarkovModel:
         self.Domain_Mapping = []
         self.Functions = []
         self.Markov_Models = []
+        self.pgmpy_Markov_Network = MN()
         self.import_markov_model(filename)
 
     """
@@ -98,6 +103,14 @@ class MarkovModel:
         # Next M-lines are the functions
         for func_idx in range(self.M):
             next_function = [eval(x) for x in f.readline().split()]
+            # Add to pgmpy MarkovNetwork
+            # Special case in handling single-variable function
+            if ( next_function[0] == 1 ):
+                self.pgmpy_Markov_Network.add_node(next_function[1])
+            # Normal case add the nodes as an edge to utilize pgmpy comprehension
+            else:
+                self.pgmpy_Markov_Network.add_edges_from([next_function[1:]])
+
             self.Functions.append(FunctionModel(next_function))
         
         #Line between sections is blank
@@ -128,6 +141,15 @@ class MarkovModel:
                 next_list_of_values = [float(x) for x in f.readline().split()]
                 list_of_values.extend(next_list_of_values)
             self.Functions[func_idx].add_table(self.Domain_Mapping, list_of_values)
+            # Create pgmpy.DiscreteFactor to add to pgmpy.MarkovNetwork
+            #print(self.Functions[func_idx].VariableIndexes)
+            #print(self.Functions[func_idx].VariableRangeList)
+            #print(self.Functions[func_idx].VariableValues)
+            pgmpy_factor = DF(
+                variables = self.Functions[func_idx].VariableIndexes, 
+                cardinality = self.Functions[func_idx].VariableRangeList, 
+                values = self.Functions[func_idx].VariableValues)
+            self.pgmpy_Markov_Network.add_factors(pgmpy_factor)
             markov_model = self.Functions[func_idx].create_dataframe()
             self.Markov_Models.append(markov_model)
 
@@ -144,20 +166,20 @@ if __name__ == '__main__':
     print('\nMarkov model from ' + filename_uai + '\n')
     x = MarkovModel(filename_uai)
     print('LENGTH: ' + str(len(x.Markov_Models)) + '\n')
-    tmp = LoadTestFormat(filename_data)
+    tmp = LoadData(filename_data)
     tmp_evid, tmp_query, tmp_weight = tmp.get_dataframes()
     #filename = '../examples/2.uai'
     #print('\nMarkov model from ' + filename + '\n')
     #y = MarkovModel(filename)
     #print('LENGTH: ' + str(len(y.Markov_Models)) + '\n')
     for i in range(1,5):
-        filename = '../examples/MLC/Sample_' + str(i) + '_MLC_2022'
+        filename = '../data/MLC/Sample_' + str(i) + '_MLC_2022'
         filename_uai = filename + '.uai'
         filename_data = filename + '.data'
         print('\nMarkov model from ' + filename_uai + '\n')
         z = MarkovModel(filename_uai)
         print('LENGTH: ' + str(len(z.Markov_Models)) + '\n')
-        tmp = LoadTestFormat(filename_data)
+        tmp = LoadData(filename_data)
         tmp_evid, tmp_query, tmp_weight = tmp.get_dataframes()
 
 
