@@ -2,7 +2,9 @@ import os, itertools
 import pandas as pd
 import numpy as np
 
-class LoadTestFormat:
+from sklearn.model_selection import train_test_split
+
+class LoadData:
     def __init__(self, filename):
 
         #Printing file location
@@ -12,22 +14,15 @@ class LoadTestFormat:
         f = open(filename, 'r')
 
         #Four Line preamble
-
-
         #First line is the total number of variables
         numberOfVariables = f.readline()
-        #print("numberOfVariables: \n" + numberOfVariables)
 
         #Getting the second line into secLine asarray
         secLine = np.asarray(f.readline().split(), dtype=np.int32)
         #Getting the first number which is the number of evidence variables
         numOfEvidenceVariables = secLine[:1]
         #Getting the rest of the line which is the indexes of observed variables
-        indexObservedVariables = secLine[1:]
-        #print("number of evidence variables:")
-        #print(numOfEvidenceVariables)
-        #print("indexes")
-        #print(indexObservedVariables)
+        self.indexObservedVariables = secLine[1:]
 
         #Third Line
         #Getting the third line
@@ -35,7 +30,7 @@ class LoadTestFormat:
         #Getting the number of queries
         numOfQueryVariables = thirdLine[:1]
         #Getting the rest of line which is the indexes of queries
-        indexQueryVariables = thirdLine[1:]
+        self.indexQueryVariables = thirdLine[1:]
 
         #Fourth Line
         # Getting the fourth line
@@ -55,7 +50,6 @@ class LoadTestFormat:
 
         fileLocation = filename
         dataPoints = []
-        #df = pd.read_csv(fileLocation, skiprows=7, sep=" ", names=["observed variables", "query variables", "weights"])
         df = pd.read_csv(filename, skiprows=6, sep=" ", header=None)
         evidence_rows = []
         query_rows = []
@@ -75,14 +69,39 @@ class LoadTestFormat:
             evidence_rows.append(evidence_row)
             query_rows.append(query_row)
 
-            #print(evidence_rows)
-            #print(query_rows)
-
         #print(df)
-        self.evidence_df = pd.DataFrame(data=evidence_rows, columns=indexObservedVariables)
-        self.query_df = pd.DataFrame(data=query_rows, columns=indexQueryVariables)
+        self.evidence_df = pd.DataFrame(data=evidence_rows, columns=self.indexObservedVariables)
+        self.query_df = pd.DataFrame(data=query_rows, columns=self.indexQueryVariables)
         self.weights_df = pd.DataFrame(data=weight_rows, columns=['weights'])
+
+    def __get_preamble(self):
+        pass
+
+    def __get_functionVars(self):
+        pass
+    
+    def get_data_splits(self):
+        self.evidence_assignments = self.evidence_df.to_numpy()
+        self.query_assignments = self.query_df.to_numpy()
+
+        return train_test_split(self.evidence_assignments, self.query_assignments, test_size=0.33)
 
     def get_dataframes(self):
         return self.evidence_df, self.query_df, self.weights_df
 
+if __name__ == '__main__':
+    print("[Test] Loading some test data ...")
+    filename = "/home/shared/anay/multiClassMarkovModel/data/1.data"
+
+
+    dataloader = LoadData(filename=filename)
+
+    e, q, wt = dataloader.get_dataframes()
+    print(e)
+    print("---------------------")
+    print(q)
+    print("---------------------")
+    print(wt)
+    print("---------------------")
+
+    print(dataloader.get_data_splits())

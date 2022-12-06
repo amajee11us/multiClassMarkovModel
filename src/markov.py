@@ -138,7 +138,7 @@ class MarkovModel:
 
 if __name__ == '__main__':
     os.chdir(os.path.dirname(__file__))
-    filename = '../examples/1'
+    filename = '../data/1'
     filename_uai = filename + '.uai'
     filename_data = filename + '.data'
     print('\nMarkov model from ' + filename_uai + '\n')

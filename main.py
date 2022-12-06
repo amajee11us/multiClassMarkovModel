@@ -7,7 +7,6 @@ import os
 from src.utils import *
 import numpy as np
 import argparse
-from src.parameterFactory import pickBestParams
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -39,13 +38,13 @@ if __name__ == "__main__":
 
     # Step 3: CLassifier 
     model = TrivialClassifier(model_name=args.clf_name)
-    params = pickBestParams(args.clf_name)
-    y_pred = model.trainval(X_train, Y_train, X_test,Y_test, params)
+    #params = pickBestParams(args.clf_name)
+    y_pred = model.trainval(X_train, Y_train, X_test,Y_test)
 
     # Step 4: Trivial Classifier
     model_trivial = TrivialClassifier(model_name="randomForest")
-    params_trivial = pickBestParams("randomForest")
-    y_pred_trivial = model_trivial.trainval(X_train, Y_train, X_test,Y_test, params_trivial)
+    #params_trivial = pickBestParams("randomForest")
+    y_pred_trivial = model_trivial.trainval(X_train, Y_train, X_test,Y_test)
 
     # Step 4: Initialize the Markov Network
     mn = MN()
