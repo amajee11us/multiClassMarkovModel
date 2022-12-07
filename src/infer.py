@@ -18,10 +18,12 @@ class BayesianInference:
         '''
         result = self.engine.query(
                             [query_var], 
-                            evidence=evidences
+                            evidence=evidences,
+                            elimination_order='MinWeight',
+                            joint=False
                             )
         print(result[query_var])
-        return result
+        return np.argmax(result[query_var].values)
 
     def evaluate(self, x_test, y_test):
         res = []
