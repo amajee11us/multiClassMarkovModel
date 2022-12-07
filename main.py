@@ -13,6 +13,10 @@ def parse_args():
         description='Assignment 4 : Markov Model for Query Assignment calculation.')
 
     # General parser
+    parser.add_argument('--model_type',
+                        default='bayesian',
+                        type=str,
+                        help='Type of model.')
     parser.add_argument('--model_name',
                         default='Sample_1_MLC_2022',
                         type=str,
@@ -31,22 +35,31 @@ if __name__ == "__main__":
     print("[Data] Loading data {} ...".format(args.model_name))
     dataloader = LoadData(os.path.join("data/MLC", args.model_name + ".data"))
 
-    X_train, Y_train, X_test, Y_test = dataloader.get_data_splits()
+    X_train, X_test, Y_train, Y_test = dataloader.get_data_splits()
+    print("Done.")
 
     # Step 2: Load the model file
     model_filename = os.path.join("data/MLC", args.model_name + ".uai")
 
-    # Step 3: CLassifier 
-    model = TrivialClassifier(model_name=args.clf_name)
-    #params = pickBestParams(args.clf_name)
-    y_pred = model.trainval(X_train, Y_train, X_test,Y_test)
+    if args.model_type == "classifier":
+        print("[Modelling] Performing Classification using Deterministic Network ...")
+        # Step 3: CLassifier 
+        model = TrivialClassifier(model_name=args.clf_name)
+        #params = pickBestParams(args.clf_name)
+        y_pred = model.trainval(X_train, Y_train, X_test,Y_test)
+    elif args.model_type == "bayesian":
+        print("[Modelling] Performing Variable ELimation on Markov Network ...")
+    print("Done.")
 
     # Step 4: Trivial Classifier
+    print("[Modelling] Learning a Trivial Network for Benchmarking (RF) ...")
     model_trivial = TrivialClassifier(model_name="randomForest")
     #params_trivial = pickBestParams("randomForest")
     y_pred_trivial = model_trivial.trainval(X_train, Y_train, X_test,Y_test)
+    print("Done.")
 
     # Step 4: Initialize the Markov Network
+    print("[Scoring] Perform Performance Benchmarking.")
     mn = MN()
     mn.read(model_filename)
 
