@@ -1,7 +1,7 @@
 import os, itertools
 import pandas as pd
 import numpy as np
-from loadData import LoadData
+from src.loadData import LoadData
 from pgmpy.models import MarkovNetwork as MN
 from pgmpy.factors.discrete import DiscreteFactor as DF
 

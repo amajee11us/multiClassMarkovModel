@@ -19,7 +19,7 @@ class BayesianInference:
         perform inference on markov model.
         '''
         result = self.engine.query(
-                            [query_var], 
+                            query_var, 
                             evidence=evidences,
                             elimination_order='MinWeight',
                             joint=False
