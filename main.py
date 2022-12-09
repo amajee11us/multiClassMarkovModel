@@ -41,6 +41,9 @@ if __name__ == "__main__":
     # Step 2: Load the model file
     model_filename = os.path.join("data/MLC", args.model_name + ".uai")
 
+    '''
+    This part produces the y_pred using our solver
+    '''
     if args.model_type == "classifier":
         print("[Modelling] Performing Classification using Deterministic Network ...")
         # Step 3: CLassifier 
@@ -49,6 +52,10 @@ if __name__ == "__main__":
         y_pred = model.trainval(X_train, Y_train, X_test,Y_test)
     elif args.model_type == "bayesian":
         print("[Modelling] Performing Variable ELimation on Markov Network ...")
+        '''
+        TODO : Add the Markov model here and return the output as y_pred.
+        '''
+    
     print("Done.")
 
     # Step 4: Trivial Classifier
