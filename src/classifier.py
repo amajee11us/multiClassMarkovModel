@@ -33,17 +33,13 @@ class TrivialClassifier:
             '''
             Parameters (in-order) : criterion, splitter, max_depth, max_features, ccp_alpha
             '''
-            self.classifier = LogisticRegression(penalty='l2',
-                                                     tol=1e-7,
-                                                     solver='lbfgs',
-                                                     max_iter=1000
+            self.classifier = LogisticRegression(max_iter=1000
                                                     )
         elif self.model_name == 'gpc':
             kernel_func = 1.0 * RBF(4.0)
             self.classifier = GaussianProcessClassifier(kernel=kernel_func)
         elif self.model_name == "randomForest":
-            self.classifier = RandomForestClassifier(n_estimators=10, 
-                                                     criterion='gini', 
+            self.classifier = RandomForestClassifier(n_estimators=10,  
                                                      max_depth=2,
                                                      verbose=1
                                                     )
