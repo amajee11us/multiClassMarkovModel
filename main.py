@@ -1,5 +1,7 @@
 from src.loadData import LoadData
 from src.classifier import TrivialClassifier
+from src.markov import MarkovModel
+from src.infer import BayesianInference
 from MN import MN
 from BTP import BTP
 
@@ -30,7 +32,6 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-
     # Step 1: Load the dataset file based on the argument passed
     print("[Data] Loading data {} ...".format(args.model_name))
     dataloader = LoadData(os.path.join("data/MLC", args.model_name + ".data"))
@@ -51,7 +52,11 @@ if __name__ == "__main__":
         #params = pickBestParams(args.clf_name)
         y_pred = model.trainval(X_train, Y_train, X_test,Y_test)
     elif args.model_type == "bayesian":
-        print("[Modelling] Performing Variable ELimation on Markov Network ...")
+        print("[Modelling] Performing Variable Elimation on Markov Network ...")
+        markov_model = MarkovModel(model_filename)
+        pgmpy_Markov_Network = markov_model.pgmpy_Markov_Network
+        model = BayesianInference(pgmpy_Markov_Network, dataloader.query_df, dataloader.evidence_df)
+        y_pred = model.evaluate(X_test, Y_test)
         '''
         TODO : Add the Markov model here and return the output as y_pred.
         '''
