@@ -55,7 +55,10 @@ if __name__ == "__main__":
         print("[Modelling] Performing Variable Elimation on Markov Network ...")
         markov_model = MarkovModel(model_filename)
         pgmpy_Markov_Network = markov_model.pgmpy_Markov_Network
-        model = BayesianInference(pgmpy_Markov_Network, dataloader.query_df, dataloader.evidence_df)
+        model = BayesianInference(pgmpy_Markov_Network, 
+                                  dataloader.indexQueryVariables, 
+                                  dataloader.indexObservedVariables,
+                                  infer_single=False)
         y_pred = model.evaluate(X_test, Y_test)
         '''
         TODO : Add the Markov model here and return the output as y_pred.
